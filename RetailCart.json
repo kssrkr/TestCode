@@ -1,0 +1,264 @@
+{
+	"info": {
+		"_postman_id": "d8044e77-aec1-478e-9ad6-138273139844",
+		"name": "Retail Cart",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Cart",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"//tests",
+							"pm.test(\"Creating a cart. Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"// let's set the retail cart Id and ETag",
+							"",
+							"let jsonData = pm.response.json();",
+							"pm.collectionVariables.set(\"retailCartId\", jsonData.id);",
+							"",
+							"pm.test(\"ETag is present\", function () {",
+							"    pm.response.to.have.header(\"ETag\");",
+							"});",
+							"pm.collectionVariables.set(\"ETag\", pm.response.headers.get(\"ETag\"));",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"{{$randomUUID}}\",\n    \"storeId\": \"008f53bf-fd0d-4c3a-abab-a80c4007358f\",\n    \"deviceNumber\": 420,\n    \"operatorNumber\": 456,\n    \"marketplaceLanguage\": \"NL\",\n    \"marketplace\": \"NL\",\n    \"expectedCurrency\": \"EUR\",\n    \"isProfileLinked\": false\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/buy/retail_carts/v2/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"buy",
+						"retail_carts",
+						"v2",
+						""
+					],
+					"query": [
+						{
+							"key": null,
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Item to Cart",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Adding Item to a cart. Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"//Update ETag",
+							"pm.collectionVariables.set(\"ETag\", pm.response.headers.get(\"ETag\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					},
+					{
+						"key": "If-Match",
+						"value": "{{ETag}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n    {\n      \"op\": \"add\",\n      \"path\": \"/lineItems/-\",\n      \"value\": {\n        \"id\": \"{{$randomUUID}}\",\n        \"retailCartId\": \"{{retailCartId}}\",\n        \"itemDetails\": {\n          \"gtin\": \"00193656895479\"\n        },\n        \"quantity\": 1,\n       \"fulfillmentOption\": \"CARRY_OUT\",\n        \"status\": \"ADDED\"\n      }\n    }\n  ];",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/buy/retail_carts/v2/{{retailCartId}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"buy",
+						"retail_carts",
+						"v2",
+						"{{retailCartId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Void a Cart",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Voiding the cart. Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					},
+					{
+						"key": "If-Match",
+						"value": "{{ETag}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/buy/retail_carts/v2/{{retailCartId}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"buy",
+						"retail_carts",
+						"v2",
+						"{{retailCartId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer"
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "68ba1597-e215-4015-9d8c-f3e4eb94096f",
+			"key": "base_url",
+			"value": "https://api-test.nikecloud.com"
+		},
+		{
+			"id": "9c5f748a-f074-4d39-9022-cdb0031708c0",
+			"key": "retailCartId",
+			"value": "123",
+			"disabled": true
+		},
+		{
+			"id": "d62c6c8d-3300-4856-8cc9-ee9b3d611d8b",
+			"key": "ETag",
+			"value": ""
+		},
+		{
+			"id": "c010dd8f-5ef3-48c8-a95b-e0cb86a4d708",
+			"key": "jwt",
+			"value": ""
+		},
+		{
+			"id": "f8a6a003-4d3f-416f-b914-8f58ee6b6135",
+			"key": "retailCartId",
+			"value": ""
+		}
+	]
+}
