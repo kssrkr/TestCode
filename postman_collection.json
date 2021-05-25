@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "TestService",
+			"name": "TestService 123",
 			"request": {
 				"method": "GET",
 				"header": [],
