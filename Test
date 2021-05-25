@@ -15,7 +15,7 @@
   "paths": {
     "/user": {
       "get": {
-        "summary": "Details about a user Sangamraju is Rocking star",
+        "summary": "Details about a user Ramesh Kandukuri",
         "operationId": "listUser",
         "tags": [
           "user"
